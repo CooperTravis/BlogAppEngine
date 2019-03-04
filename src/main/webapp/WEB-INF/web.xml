@@ -25,13 +25,13 @@
  	
  	<servlet>
  	
- 		<servlet-name>Subscription</servlet-name>
+ 		<servlet-name>DailySummaryServlet</servlet-name>
  	
  	</servlet>
  	
  	<servlet-mapping>
  	
- 		<servlet-name>Subscription</servlet-name>
+ 		<servlet-name>DailySummaryServlet</servlet-name>
  		
  		<url-pattern>/cron/dailysummary</url-pattern>
  	
