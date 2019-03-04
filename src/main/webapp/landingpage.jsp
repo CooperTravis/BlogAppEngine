@@ -37,9 +37,13 @@
 	User user = userService.getCurrentUser();
 	if(user != null){
 		pageContext.setAttribute("user", user);
+		
 %>
 <p>Hello, ${fn:escapeXml(user.nickname)}! (You can
 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign out</a>.)</p>
+<form action="/subscribe" method="post">
+	<div><input type="submit" value="Subscribe"></div>
+</form>
 <%
 	} else{
 %>
