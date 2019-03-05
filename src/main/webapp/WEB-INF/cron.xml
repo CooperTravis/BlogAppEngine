@@ -3,7 +3,7 @@
   <cron>
     <url>/cron/dailysummary</url>
     <description>daily summary of blog posts</description>
-    <schedule>every day 17:00</schedule>
+    <schedule>every day 18:51</schedule>
     <timezone>America/Chicago</timezone>
   </cron>
 </cronentries>

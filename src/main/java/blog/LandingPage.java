@@ -8,6 +8,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.users.UserService;
 
+@SuppressWarnings("serial")
 public class LandingPage extends HttpServlet{
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) 
 		throws IOException{
