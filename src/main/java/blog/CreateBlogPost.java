@@ -3,6 +3,7 @@ package blog;
 // Data Store imports
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -28,7 +29,7 @@ public class CreateBlogPost extends HttpServlet {
 		// NEWEST UPDATE
 		String blogName = req.getParameter("blogName");
 		Key blogKey = KeyFactory.createKey("Blog", blogName);
-		String content = req.getParameter("content");
+		Text content = new Text(req.getParameter("content"));
 		String title = req.getParameter("title");
 		Date date = new Date();
 		Entity blogPost = new Entity("Post", blogKey);
