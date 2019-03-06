@@ -19,6 +19,7 @@ public class SubscribeServlet extends HttpServlet {
 	
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
+		
 		String blogName = req.getParameter("blogName");
 		Key blogKey = KeyFactory.createKey("Blog", blogName);
 		Entity u = new Entity("Users", blogKey);
@@ -28,7 +29,7 @@ public class SubscribeServlet extends HttpServlet {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	    datastore.put(u);
 		
-	
+	    resp.sendRedirect("/landingpage.jsp?blogName=" + blogName);
 	}
 	
 	

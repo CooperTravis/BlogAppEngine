@@ -10,6 +10,7 @@ import javax.servlet.http.*;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -50,7 +51,7 @@ public class DailySummaryServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) 
 	throws ServletException, IOException {
 	
-	doGet(req, resp);
+		doGet(req, resp);
 	
 	}
 	
@@ -117,7 +118,15 @@ public class DailySummaryServlet extends HttpServlet {
 			status = true;
 			msgBody.concat("\nFrom: " + (String) e.getProperty("user") + " on " + date.toString() + "\n");
 			msgBody.concat((String) e.getProperty("title") + "\n");
-			msgBody.concat((String) e.getProperty("content") + "\n");
+			if(e.getProperty("content") instanceof Text) {
+				Text t = (Text) e.getProperty("content");
+				msgBody.concat(t.getValue() + "\n");
+			}
+			else {
+				msgBody.concat((String) e.getProperty("content") + "\n");
+			}
+			
+
 			
 		}
 		
