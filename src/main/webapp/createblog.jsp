@@ -22,6 +22,11 @@
 <title>Insert title here</title>
 </head>
 <body>
+<h1>
+<img align="right" src="/pictures/austin-texas-state-capitol-panorama-paul-velgos.jpg" width="100%">
+</h1>
+
+<h2>CDBlog: A Blog dedicated to local events in and around the Austin Area!</h2>
 
 <%
 	
