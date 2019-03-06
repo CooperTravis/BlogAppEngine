@@ -12,6 +12,8 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -26,6 +28,8 @@ import javax.mail.internet.*;
 @SuppressWarnings("serial")
 public class DailySummaryServlet extends HttpServlet {
 	
+	
+	private static final Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 	
 	private static final String DATE_FORMAT_NOW = "yyyy-MM-dd";
 	private static final Logger _logger = Logger.getLogger(DailySummaryServlet.class.getName());
@@ -71,8 +75,9 @@ public class DailySummaryServlet extends HttpServlet {
 			dailySummary.setFrom(new InternetAddress("ctravis096@gmail.com", "CD Blog Daily Summary"));
 
 			
-			// ADD ALL RECIPIENTS FROM DATASTORE			
-			addRecipients(dailySummary, datastore);
+			// ADD ALL RECIPIENTS FROM DATASTORE
+			dailySummary.addRecipient(Message.RecipientType.TO, new InternetAddress( "dterral504@gmail.com", "David Terral"));
+			//addRecipients(dailySummary, datastore);
 			
 			// get current date as string and set subject
 			String curr_date = dateAsString();
@@ -83,11 +88,8 @@ public class DailySummaryServlet extends HttpServlet {
 			String msgBody = "";
 			boolean status = generateDailySummary(msgBody, datastore);
 			dailySummary.setText(msgBody);
-			System.out.println(dailySummary.getAllRecipients());
 			
-			
-			if(status)
-				Transport.send(dailySummary);	
+			Transport.send(dailySummary);	
 			
 			
 		} catch (AddressException e ){
@@ -107,7 +109,8 @@ public class DailySummaryServlet extends HttpServlet {
 		boolean status = false;
 		msgBody.concat("Dear User,\nThe following is a summary of blog posts from the past 24 hours:\n");
 		
-		Query query = new Query("Post").addSort("date", Query.SortDirection.DESCENDING);
+		
+		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
 		Iterable<Entity> posts = datastore.prepare(query).asIterable();
 		
 		for(Entity e: posts) {
@@ -139,7 +142,7 @@ public class DailySummaryServlet extends HttpServlet {
 
 	private void addRecipients(Message dailySummary, DatastoreService datastore) {
 		Filter f = new FilterPredicate("subscribe", FilterOperator.EQUAL, true);
-		Query q = new Query("Users").setFilter(f);
+		Query q = new Query("Users", blogKey).setFilter(f);
 		PreparedQuery pq = datastore.prepare(q);			
 		for(Entity e: pq.asIterable()) {
 			User recipient = (User) e.getProperty("user");
