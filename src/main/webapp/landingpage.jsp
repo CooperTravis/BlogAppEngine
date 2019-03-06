@@ -6,6 +6,7 @@
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
 <%@ page import="com.google.appengine.api.datastore.DatastoreServiceFactory" %>
 <%@ page import="com.google.appengine.api.datastore.DatastoreService" %>
+<%@ page import="com.google.appengine.api.datastore.Text" %>
 <%@ page import="com.google.appengine.api.datastore.Query" %>
 <%@ page import="com.google.appengine.api.datastore.Entity" %>
 <%@ page import="com.google.appengine.api.datastore.FetchOptions" %>
@@ -39,11 +40,17 @@
 		pageContext.setAttribute("user", user);
 		
 %>
-<p>Hello, ${fn:escapeXml(user.nickname)}! (You can
+<p align="right">Hello, ${fn:escapeXml(user.nickname)}! (You can
 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign out</a>.)</p>
+
 <form action="/subscribe" method="post">
-	<div><input type="submit" value="Subscribe"></div>
+	<div align="right"><input type="submit" value="Subscribe"></div>
 </form>
+
+<form action="/createblog.jsp">
+	<div align="right"><input type="submit" value="Create a Post" /></div>
+</form>
+
 <%
 	} else{
 %>
@@ -72,10 +79,19 @@ to create your own blog entries.</p>
 	else{
 		%>
 		<p>Recent posts in ${fn:escapeXml(blogName)}.</p>
+		
 		<%
 		for(Entity post: posts){
 			pageContext.setAttribute("post_title", post.getProperty("title"));
-			pageContext.setAttribute("post_content", post.getProperty("content"));
+			String content = "";
+			if(post.getProperty("content") instanceof Text){
+				Text t = (Text) post.getProperty("content");
+				content = t.getValue();
+			}
+			else{
+				content = (String) post.getProperty("content");
+			}
+			pageContext.setAttribute("post_content", content);
 			pageContext.setAttribute("post_user", post.getProperty("user"));
 			pageContext.setAttribute("post_time", post.getProperty("date"));
 			%>
@@ -89,13 +105,6 @@ to create your own blog entries.</p>
 		
 %>
 
-<!-- Need this to be the blog creation link -->
-<form action="/create" method="post">
-	<div><textarea name="title" rows="1" cols="60">Title</textarea></div>
-	<div><textarea name="content" rows="30" cols="60">Content</textarea></div>
-	<div><input type="submit" value="Post Blog"></div>
-	<input type="hidden" name="blogName" value="${fn:escapeXml(blogName)}"/>
-</form>
 
 
 </body>
