@@ -42,8 +42,9 @@
  	<servlet>
  	
  		<servlet-name>DailySummaryServlet</servlet-name>
- 		
+
  		<servlet-class>blog.DailySummaryServlet</servlet-class>
+
  	
  	</servlet>
  	

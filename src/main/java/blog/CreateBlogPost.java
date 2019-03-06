@@ -11,6 +11,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
+
 import java.io.IOException;
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+@SuppressWarnings("serial")
 public class CreateBlogPost extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws IOException{
