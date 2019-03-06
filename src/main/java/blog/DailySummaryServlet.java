@@ -81,13 +81,58 @@ public class DailySummaryServlet extends HttpServlet {
 			String curr_date = dateAsString();
 			dailySummary.setSubject("CD Blog Daily Summarry: "+curr_date);
 			
+
+			
 			
 			// TODO: SET BODY TEXT
 			String msgBody = "";
-			boolean status = generateDailySummary(msgBody, datastore);
+			
+			
+			boolean status = false;
+			msgBody = msgBody.concat("Dear User,\nThe following is a summary of blog posts from the past 24 hours:\n");
+			_logger.info(msgBody);
+			
+			Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
+			
+			Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
+			PreparedQuery pq = datastore.prepare(query);
+			
+			_logger.info("Query passed");
+			
+			
+			for(Entity e: pq.asIterable()) {
+				Date date = (Date) e.getProperty("date");
+				_logger.info("Date was acquired");
+				Date now = new Date();
+				// if post is from  more than 24 hours ago we are finished
+				if(now.getTime() - date.getTime() >= 86400000)
+					break;
+				status = true;
+				
+				// Getting user and date
+				String u = (String) e.getProperty("user");
+				String d = date.toString();
+				msgBody = msgBody.concat("\nFrom: " + u + "\n" + d + "\n");
+				
+				// Getting title of post
+				String title = (String) e.getProperty("title");
+				msgBody = msgBody.concat("Title: " + title + "\n");
+				
+				// Gets the content of the post
+				Text t = (Text) e.getProperty("content");
+				String m = t.getValue();
+				msgBody = msgBody.concat("Content: " + m + "\n");			
+			}
+			_logger.info("Daily summary generated");
+			
+			msgBody = msgBody.concat("\nEND OF EMAIL SUMMARY");
+			
+			_logger.info(msgBody);
 			dailySummary.setText(msgBody);
 			
-			Transport.send(dailySummary);	
+			if(status) {
+				Transport.send(dailySummary);
+			}
 			
 			
 		} catch (AddressException e ){
@@ -103,49 +148,16 @@ public class DailySummaryServlet extends HttpServlet {
 	}
 
 
-	private boolean generateDailySummary(String msgBody, DatastoreService datastore) {
-		boolean status = false;
-		msgBody.concat("Dear User,\nThe following is a summary of blog posts from the past 24 hours:\n");
-		
-		Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
-		
-		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
-		List<Entity> posts = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5000));
-		
-		for(Entity e: posts) {
-			Date date = (Date) e.getProperty("date");
-//			Date now = new Date();
-			// if post if from  more than 24 hours ago we are finished
-//			if(now.getTime() - date.getTime() >= 86400000)
-//				break;
-			status = true;
-			msgBody.concat("\nFrom: " + (String) e.getProperty("user") + " on " + date.toString() + "\n");
-			msgBody.concat((String) e.getProperty("title") + "\n");
-			if(e.getProperty("content") instanceof Text) {
-				Text t = (Text) e.getProperty("content");
-				msgBody.concat(t.getValue() + "\n");
-			}
-			else {
-				msgBody.concat((String) e.getProperty("content") + "\n");
-			}
-			
-
-			
-		}
-		
-		msgBody.concat("END OF EMAIL SUMMARY!");
-		
-		return status;
-	}
-
 
 	private void addRecipients(Message dailySummary, DatastoreService datastore) {
+		_logger.info("AddRecipients");
 		Filter f = new FilterPredicate("subscribed", FilterOperator.EQUAL, true);
 		Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 		Query q = new Query("Users", blogKey).setFilter(f);
 		PreparedQuery pq = datastore.prepare(q);			
 		for(Entity e: pq.asIterable()) {
 			User recipient = (User) e.getProperty("user");
+			_logger.info(recipient.getEmail());
 			try {
 				dailySummary.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient.getEmail(), recipient.getNickname()));
 			} catch (UnsupportedEncodingException e1) {
