@@ -43,7 +43,8 @@
  	
  		<servlet-name>DailySummaryServlet</servlet-name>
 
-		 <servlet-class>blog.DailySummaryServlet</servlet-class>
+ 		<servlet-class>blog.DailySummaryServlet</servlet-class>
+
  	
  	</servlet>
  	
