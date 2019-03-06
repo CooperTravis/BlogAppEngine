@@ -68,7 +68,7 @@ public class DailySummaryServlet extends HttpServlet {
 			Message dailySummary = new MimeMessage(session);
 
 			// set sender
-			dailySummary.setFrom(new InternetAddress("admin@ee461lhw6blog.appspot.com", "CD Blog Admin"));
+			dailySummary.setFrom(new InternetAddress("ctravis096@gmail.com", "CD Blog Daily Summary"));
 
 			
 			// ADD ALL RECIPIENTS FROM DATASTORE			
@@ -83,6 +83,7 @@ public class DailySummaryServlet extends HttpServlet {
 			String msgBody = "";
 			boolean status = generateDailySummary(msgBody, datastore);
 			dailySummary.setText(msgBody);
+			System.out.println(dailySummary.getAllRecipients());
 			
 			
 			if(status)

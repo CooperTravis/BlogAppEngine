@@ -46,12 +46,14 @@
 	if(user != null){
 		pageContext.setAttribute("user", user);
 		
+		
 %>
 <p align="right">Hello, ${fn:escapeXml(user.nickname)}! (You can
 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign out</a>.)</p>
 
 <form action="/subscribe" method="post">
 	<div align="right"><input type="submit" value="Subscribe"></div>
+	<input type="hidden" name="blogName" value="${fn:escapeXml(blogName)}"/>
 </form>
 
 <form action="/createblog.jsp">
