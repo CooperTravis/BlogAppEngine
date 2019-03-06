@@ -12,6 +12,10 @@
 <%@ page import="com.google.appengine.api.datastore.FetchOptions" %>
 <%@ page import="com.google.appengine.api.datastore.Key" %>
 <%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
+<%@ page import="com.google.appengine.api.datastore.Query.Filter" %>
+<%@ page import="com.google.appengine.api.datastore.Query.FilterOperator" %>
+<%@ page import="com.google.appengine.api.datastore.Query.FilterPredicate" %>
+<%@ page import="com.google.appengine.api.datastore.PreparedQuery" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
@@ -38,6 +42,10 @@
 		blogName = "CDBlog";
 	}
 	pageContext.setAttribute("blogName", blogName);
+	
+	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+	Key blogKey = KeyFactory.createKey("Blog", blogName);
+	
 
 	
 	
@@ -50,11 +58,39 @@
 %>
 <p align="right">Hello, ${fn:escapeXml(user.nickname)}! (You can
 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign out</a>.)</p>
+<% 
+	boolean subscribed = false;
+	Filter f = new FilterPredicate("subscribed", FilterOperator.EQUAL, true);
+	Query q = new Query("Users", blogKey).setFilter(f);
+	PreparedQuery pq = datastore.prepare(q);			
+	for(Entity e: pq.asIterable()) {
+		User u = (User) e.getProperty("user");
+		if(u.equals(user)){
+			subscribed = true;
+			break;
+		}
+	}
+	
+	if(subscribed){
+%>
+<form action="/unsubscribe" method="post">
+	<div align="right"><input type="submit" value="Unsubscribe"></div>
+	<input type="hidden" name="blogName" value="${fn:escapeXml(blogName)}"/>
+</form>
+
+<% }
+	else{
+	%>
+
 
 <form action="/subscribe" method="post">
 	<div align="right"><input type="submit" value="Subscribe"></div>
 	<input type="hidden" name="blogName" value="${fn:escapeXml(blogName)}"/>
 </form>
+
+<% } 
+
+%>
 
 <form action="/createblog.jsp">
 	<div align="right"><input type="submit" value="Create a Post" /></div>
@@ -73,9 +109,7 @@ to create your own blog entries.</p>
 <%
 
 	// Setting up the datastore
-	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-	Key blogKey = KeyFactory.createKey("Blog", blogName);
-	
+
 	String showAll = request.getParameter("showAll");
 	if(showAll == null){
 		showAll = "False";
