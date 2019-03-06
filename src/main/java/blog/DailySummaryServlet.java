@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
@@ -27,9 +28,6 @@ import javax.mail.internet.*;
 
 @SuppressWarnings("serial")
 public class DailySummaryServlet extends HttpServlet {
-	
-	
-	private static final Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 	
 	private static final String DATE_FORMAT_NOW = "yyyy-MM-dd";
 	private static final Logger _logger = Logger.getLogger(DailySummaryServlet.class.getName());
@@ -76,8 +74,8 @@ public class DailySummaryServlet extends HttpServlet {
 
 			
 			// ADD ALL RECIPIENTS FROM DATASTORE
-			dailySummary.addRecipient(Message.RecipientType.TO, new InternetAddress( "dterral504@gmail.com", "David Terral"));
-			//addRecipients(dailySummary, datastore);
+			//dailySummary.addRecipient(Message.RecipientType.TO, new InternetAddress( "dterral504@gmail.com", "David Terral"));
+			addRecipients(dailySummary, datastore);
 			
 			// get current date as string and set subject
 			String curr_date = dateAsString();
@@ -109,16 +107,17 @@ public class DailySummaryServlet extends HttpServlet {
 		boolean status = false;
 		msgBody.concat("Dear User,\nThe following is a summary of blog posts from the past 24 hours:\n");
 		
+		Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 		
 		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
-		Iterable<Entity> posts = datastore.prepare(query).asIterable();
+		List<Entity> posts = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5000));
 		
 		for(Entity e: posts) {
 			Date date = (Date) e.getProperty("date");
-			Date now = new Date();
+//			Date now = new Date();
 			// if post if from  more than 24 hours ago we are finished
-			if(now.getTime() - date.getTime() >= 86400000)
-				break;
+//			if(now.getTime() - date.getTime() >= 86400000)
+//				break;
 			status = true;
 			msgBody.concat("\nFrom: " + (String) e.getProperty("user") + " on " + date.toString() + "\n");
 			msgBody.concat((String) e.getProperty("title") + "\n");
@@ -141,7 +140,8 @@ public class DailySummaryServlet extends HttpServlet {
 
 
 	private void addRecipients(Message dailySummary, DatastoreService datastore) {
-		Filter f = new FilterPredicate("subscribe", FilterOperator.EQUAL, true);
+		Filter f = new FilterPredicate("subscribed", FilterOperator.EQUAL, true);
+		Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 		Query q = new Query("Users", blogKey).setFilter(f);
 		PreparedQuery pq = datastore.prepare(q);			
 		for(Entity e: pq.asIterable()) {
