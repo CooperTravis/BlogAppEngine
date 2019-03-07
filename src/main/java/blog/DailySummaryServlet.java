@@ -149,6 +149,7 @@ public class DailySummaryServlet extends HttpServlet {
 
 
 
+
 	private void addRecipients(Message dailySummary, DatastoreService datastore) {
 		_logger.info("AddRecipients");
 		Filter f = new FilterPredicate("subscribed", FilterOperator.EQUAL, true);
