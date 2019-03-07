@@ -51,11 +51,11 @@
 <form action="/create" method="post">
   <div class="form-group">
     <label for="exampleFormControlInput1">Post Title:</label>
-    <input name="title" type="text" class="form-control" placeholder="Title">
+    <input name="title" type="text" class="form-control" placeholder="Title" required>
   </div>
   <div class="form-group">
     <label for="exampleFormControlTextarea1">Post Content:</label>
-    <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="20"></textarea>
+    <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="20" required></textarea>
   </div>
 <!-- </form>
 

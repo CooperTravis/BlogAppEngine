@@ -157,7 +157,7 @@ to create your own blog entries.</p>
 				
 			<div class="container">
 				<h3>${fn:escapeXml(post_title)}</h3>
-				<p>Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
+				<p style="color:gray; font-size:10px;">Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
 				<p>${fn:escapeXml(post_content)}</p>
 			</div>		
 				
@@ -225,7 +225,7 @@ to create your own blog entries.</p>
 
 			<div class="container">
 				<h3>${fn:escapeXml(post_title)}</h3>
-				<p>Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
+				<p style="color:gray; font-size:10px;">Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
 				<p>${fn:escapeXml(post_content)}</p>
 			</div>	
 
