@@ -87,7 +87,10 @@ public class DailySummaryServlet extends HttpServlet {
 			boolean status = generateDailySummary(msgBody, datastore);
 			dailySummary.setText(msgBody);
 			
-			Transport.send(dailySummary);	
+			if(status) {
+				Transport.send(dailySummary);
+			}
+				
 			
 			
 		} catch (AddressException e ){
@@ -110,7 +113,7 @@ public class DailySummaryServlet extends HttpServlet {
 		Key blogKey = KeyFactory.createKey("Blog", "CDBlog");
 		
 		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
-		List<Entity> posts = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5000));
+		Iterable<Entity> posts = datastore.prepare(query).asIterable();
 		
 		for(Entity e: posts) {
 			Date date = (Date) e.getProperty("date");

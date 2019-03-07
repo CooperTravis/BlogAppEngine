@@ -14,20 +14,27 @@
 <%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-
 <html>
+
 <head>
-<meta charset="UTF-8">
-<title>Blog</title>
-
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<title>Blog</title>
 </head>
+
 <body>
-<h1>
-<img align="right" src="/pictures/austin-texas-state-capitol-panorama-paul-velgos.jpg" width="100%">
-</h1>
+<div class="container">
 
-<h2>CDBlog: A Blog dedicated to local events in and around the Austin Area!</h2>
+<!-- Web page image -->
+	<h1><img align="right" src="/pictures/austin-texas-state-capitol-panorama-paul-velgos.jpg" width="100%"></h1>
 
+<!-- TITLE CONTAINER -->
+	<div>
+		<h4>CDBlog - The latest on local events in Austin Area!</h4>
+	</div>
+
+
+<!-- ********************************************************** -->
 <%
 	
 	/*
@@ -48,29 +55,50 @@
 		
 		
 %>
-<p align="right">Hello, ${fn:escapeXml(user.nickname)}! (You can
+<!-- ********************************************************** -->
+
+
+
+<p align="right">
+	Hello, ${fn:escapeXml(user.nickname)}! (You can
 <a href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign out</a>.)</p>
 
-<form action="/subscribe" method="post">
-	<div align="right"><input type="submit" value="Subscribe"></div>
+<%-- <form method="get" action="<%=userService.createLogoutURL(request.getRequestURI())%>">
+	<button class="btn btn-primary">Sign Out</button>
+</form> --%>
+
+<div align="right">
+<form action="/subscribe" method="post" style="display:inline-block;">
+	<div align="right">
+		<button class ="btn btn-primary" title="subscribe to receive a daily summary of blog posts">Subscribe</button>
+	</div>
 	<input type="hidden" name="blogName" value="${fn:escapeXml(blogName)}"/>
 </form>
 
-<form action="/createblog.jsp">
-	<div align="right"><input type="submit" value="Create a Post" /></div>
+<form action="/createblog.jsp" style="display:inline-block;">
+	<div align="right">
+		<button class ="btn btn-primary" type="submit">Create a Post</button>
+	</div>
 </form>
+</div>
 
+
+<!-- ********************************************************** -->
 <%
 	} else{
 %>
-<p>Hello!
+<!-- ********************************************************** -->
+
+
+<p align="right">Hello!
 <a href="<%=userService.createLoginURL(request.getRequestURI()) %>">Sign in</a>
 to create your own blog entries.</p>
+
+
+
+<!-- ********************************************************** -->
 <%
 	}
-%>
-
-<%
 
 	// Setting up the datastore
 	DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -90,15 +118,25 @@ to create your own blog entries.</p>
 		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
 		List<Entity> posts = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
 		if(posts.isEmpty()){
-			%>
-			<p>${fn:escapeXml(blogName)} has no posts.</p>
-			<%
+%>
+<!-- ********************************************************** -->
+
+
+
+	<p>The blog is empty.  Click 'Create a Post' to write the first blog!</p>			
+			
+			
+			
+<!-- ********************************************************** -->
+<%
 		}
 		else{
-			%>
-			<p>Recent posts in ${fn:escapeXml(blogName)}.</p>
+%>
+<!-- ********************************************************** -->
+
 			
-			<%
+<!-- ********************************************************** -->			
+<%
 			for(Entity post: posts){
 				pageContext.setAttribute("post_title", post.getProperty("title"));
 				String content = "";
@@ -112,20 +150,35 @@ to create your own blog entries.</p>
 				pageContext.setAttribute("post_content", content);
 				pageContext.setAttribute("post_user", post.getProperty("user"));
 				pageContext.setAttribute("post_time", post.getProperty("date"));
-				%>
-				<p><b>${fn:escapeXml(post_title)}</b></p>
-				<p>${fn:escapeXml(post_user)}</p>
-				<p>${fn:escapeXml(post_time)}</p>
+%>
+<!-- ********************************************************** -->
+
+
+				
+			<div class="container">
+				<h3>${fn:escapeXml(post_title)}</h3>
+				<p>Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
 				<p>${fn:escapeXml(post_content)}</p>
-				<%
-			}
-			
-			%>
+			</div>		
+				
+<!-- ********************************************************** -->				
+<%
+			}			
+%>
+<!-- ********************************************************** -->
+
+
+
 			<form action="/landingpage.jsp">
-				<div align="center"><input type="submit" value="Show All Posts"></div>
+				<div align="center">
+					<button class="btn btn-primary" type="submit">Show All Posts</button>
+				</div>
 				<input type="hidden" name="showAll" value="True"/>
 			</form>
-			<% 
+			
+			
+<!-- ********************************************************** -->
+<% 
 			
 		}
 	}
@@ -133,15 +186,26 @@ to create your own blog entries.</p>
 		Query query = new Query("Post", blogKey).addSort("date", Query.SortDirection.DESCENDING);
 		List<Entity> posts = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5000));
 		if(posts.isEmpty()){
-			%>
+%>
+<!-- ********************************************************** -->
+
+
 			<p>${fn:escapeXml(blogName)} has no posts.</p>
-			<%
+
+
+<!-- ********************************************************** -->
+<%
 		}
 		else{
-			%>
+%>
+<!-- ********************************************************** -->
+
+
 			<p>Recent posts in ${fn:escapeXml(blogName)}.</p>
 			
-			<%
+			
+<!-- ********************************************************** -->			
+<%
 			for(Entity post: posts){
 				pageContext.setAttribute("post_title", post.getProperty("title"));
 				String content = "";
@@ -155,27 +219,49 @@ to create your own blog entries.</p>
 				pageContext.setAttribute("post_content", content);
 				pageContext.setAttribute("post_user", post.getProperty("user"));
 				pageContext.setAttribute("post_time", post.getProperty("date"));
-				%>
-				<p><b>${fn:escapeXml(post_title)}</b></p>
+%>
+<!-- ********************************************************** -->
+
+
+			<div class="container">
+				<h3>${fn:escapeXml(post_title)}</h3>
+				<p>Posted by: ${fn:escapeXml(post_user)} on ${fn:escapeXml(post_time)}</p>
+				<p>${fn:escapeXml(post_content)}</p>
+			</div>	
+
+				<%-- <p><b>${fn:escapeXml(post_title)}</b></p>
 				<p>${fn:escapeXml(post_user)}</p>
 				<p>${fn:escapeXml(post_time)}</p>
-				<p>${fn:escapeXml(post_content)}</p>
-				<%
+				<p>${fn:escapeXml(post_content)}</p> --%>
+				
+				
+<!-- ********************************************************** -->
+<%
 			}
-			
-			%>
+%>
+<!-- ********************************************************** -->
+
+
 			
 			<form action="/landingpage.jsp">
-				<div align="center"><input type="submit" value="Less Posts"></div>
+				<div align="center">
+					<button class="btn btn-primary" type="submit">Show Less</button>
+				</div>
 			</form>
 			
-			<%
-		}
-		
+			
+
+<!-- ********************************************************** -->			
+<%
+		}		
 	}
-		
 %>
+<!-- ********************************************************** -->
 
 
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</div>
 </body>
 </html>
